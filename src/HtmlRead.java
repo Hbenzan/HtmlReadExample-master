@@ -19,7 +19,7 @@ public class HtmlRead {
             );
             String line;
             while ( (line = reader.readLine()) != null ) {
-                if (line.contains("https")) {
+                if (line.contains("href")) {
                     int start = line.indexOf("https");
                     //task: chop off the html before the https
                     System.out.println(line.substring(start));

@@ -166,8 +166,25 @@ public class Layout implements ActionListener {
                             System.out.println(line.substring(start));
                             String link = line.substring(start);
                             int end = link.indexOf("\"");
-                            System.out.println("chop start:"+ link);
-                            System.out.println("link "+ link.substring(7,end));
+                            int finish = link.indexOf("\'");
+                            if (finish == -1) {
+                                ta.append(link.substring(0,end));
+                                System.out.println("chop start:"+ link);
+                                System.out.println("link "+ link.substring(0,end));
+                            } else if(end == -1){
+                                ta.append(link.substring(0,finish));
+                                System.out.println("chop start:"+ link);
+                                System.out.println("link "+ link.substring(0,finish));
+                            }
+                            else if (finish > end) {
+                                ta.append(link.substring(0,finish));
+                                System.out.println("chop start:"+ link);
+                                System.out.println("link "+ link.substring(0,end));
+                            } else {
+                                ta.append(link.substring(0,end));
+                                System.out.println("chop start:"+ link);
+                                System.out.println("link "+ link.substring(0,finish));
+                            }
                         }
                     }
                     reader.close();

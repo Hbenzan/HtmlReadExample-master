@@ -30,13 +30,13 @@ public class HtmlRead {
             String line;
             while ( (line = reader.readLine()) != null ) {
                 if (line.contains("href")) {
-                    int start = line.indexOf("https");
+                    int start = line.indexOf("href");
                     //task: chop off the html before the https
                     System.out.println(line.substring(start));
                     String link = line.substring(start);
                     int end = link.indexOf("\"");
                     System.out.println("chop start:"+ link);
-                    System.out.println("link "+ link.substring(7,end));
+                    System.out.println("link "+ link.substring(0,end));
                     //HW is to print out all of the links - put assignment on github
                 }
             }

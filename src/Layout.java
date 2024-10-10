@@ -8,7 +8,9 @@ import java.awt.event.WindowEvent;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.URL;
+import javax.swing.JScrollPane;
 import java.security.PrivateKey;
+import java.sql.SQLOutput;
 
 public class Layout implements ActionListener {
     private JFrame mainFrame;
@@ -19,8 +21,10 @@ public class Layout implements ActionListener {
     private JTextArea ta1;
     private JTextArea ta2;
     private JPanel gamePanel;
+    private JPanel smallPanel;
     private JMenuBar mb;
     private JMenu file, edit, help;
+    private JScrollPane scroll;
     private JMenuItem cut, copy, paste, selectAll;
     private int WIDTH=800;
     private int HEIGHT=700;
@@ -56,7 +60,6 @@ public class Layout implements ActionListener {
         ta.setColumns(20); // Adjust columns for width
 
 
-
 //            mb = new JMenuBar();
 //            file = new JMenu("File");
 //            edit = new JMenu("Edit");
@@ -85,6 +88,11 @@ public class Layout implements ActionListener {
         statusLabel2 = new JLabel("Results", JLabel.CENTER);
         statusLabel2.setSize(350, 100);
 
+        statusLabel.setFont(new Font("Silom", Font.PLAIN,14));
+        statusLabel1.setFont(new Font("Silom", Font.PLAIN,14));
+        statusLabel2.setFont(new Font("Silom", Font.PLAIN,14));
+
+
 
         mainFrame.addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent windowEvent) {
@@ -93,7 +101,11 @@ public class Layout implements ActionListener {
         });
 
         gamePanel = new JPanel();
+        smallPanel = new JPanel();
+
         gamePanel.setLayout(new GridLayout(7,1));
+        smallPanel.setLayout(new GridLayout(1,2));
+     //   mainFrame.add(scrollPane);
 
         ta = new JTextArea(); //A text area so the user can input an url
         ta.setBounds(300, 5, WIDTH-100, HEIGHT-100);
@@ -114,19 +126,24 @@ public class Layout implements ActionListener {
 
         startButton.setActionCommand("Start");
 
+        JButton resetButton = new JButton("Reset");
+
+        resetButton.setActionCommand("Reset");
+
         startButton.addActionListener(new ButtonClickListener());
 
-        JTextArea ta = new JTextArea();
-        JTextArea ta1 = new JTextArea();
-        JTextArea ta2 = new JTextArea();
+        resetButton.addActionListener(new ButtonClickListener());
 
-        gamePanel.add(startButton);
+        scroll = new JScrollPane(ta2);
         gamePanel.add(statusLabel);
         gamePanel.add(ta);
         gamePanel.add(statusLabel1);
         gamePanel.add(ta1);
         gamePanel.add(statusLabel2);
-        gamePanel.add(ta2);
+        gamePanel.add(scroll);
+        gamePanel.add(smallPanel);
+        smallPanel.add(resetButton);
+        smallPanel.add(startButton);
 
         mainFrame.setVisible(true);
     }
@@ -141,18 +158,24 @@ public class Layout implements ActionListener {
             ta.copy();
         if (e.getSource() == selectAll)
             ta.selectAll();
+
     }
 
     private class ButtonClickListener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
             String command = e.getActionCommand();
+            if (command.equals("Reset")) {
+                ta.setText("");
+                ta1.setText("");
+                ta2.setText("");
 
+            }
             if (command.equals("Start")) {
 //                statusLabel.setText(");
                 try {
                     System.out.println();
                     System.out.print("hello \n");
-                    URL url = new URL("https://www.milton.edu/");
+                    URL url = new URL(ta.getText());
                     BufferedReader reader = new BufferedReader(
                             new InputStreamReader(url.openStream())
                     );
@@ -163,27 +186,38 @@ public class Layout implements ActionListener {
                             int start = line.indexOf("href")+6;
                             System.out.println(line);
                             //task: chop off the html before the https
+                            System.out.println(ta.getText());
                             System.out.println(line.substring(start));
                             String link = line.substring(start);
                             int end = link.indexOf("\"");
                             int finish = link.indexOf("\'");
                             if (finish == -1) {
-                                ta.append(link.substring(0,end));
                                 System.out.println("chop start:"+ link);
-                                System.out.println("link "+ link.substring(0,end));
+                                System.out.print("link "+ link.substring(0,end) + "\n");
+                                if (link.substring(0,end).contains(ta1.getText())){
+                                    ta2.append(link.substring(0,end) + "\n");
+                                }
+                                System.out.println(ta1.getText());
+
                             } else if(end == -1){
-                                ta.append(link.substring(0,finish));
                                 System.out.println("chop start:"+ link);
                                 System.out.println("link "+ link.substring(0,finish));
+                                if (link.substring(0,end).contains(ta1.getText())){
+                                    ta2.append(link.substring(0,end) + "\n");
+                                }
                             }
                             else if (finish > end) {
-                                ta.append(link.substring(0,finish));
                                 System.out.println("chop start:"+ link);
                                 System.out.println("link "+ link.substring(0,end));
+                                if (link.substring(0,end).contains(ta1.getText())){
+                                    ta2.append(link.substring(0,end) + "\n");
+                                }
                             } else {
-                                ta.append(link.substring(0,end));
                                 System.out.println("chop start:"+ link);
                                 System.out.println("link "+ link.substring(0,finish));
+                                if (link.substring(0,end).contains(ta1.getText())){
+                                    ta2.append(link.substring(0,end) + "\n");
+                                }
                             }
                         }
                     }
@@ -191,11 +225,13 @@ public class Layout implements ActionListener {
                 } catch(Exception ex) {
                     System.out.println(ex);
                     System.out.println("There's an error somewhere try again");
+                    System.out.println("You messed up your link");
+                    statusLabel.setText("You messed up your link");
                 }
             } else if (command.equals("Submit")) {
                 statusLabel.setText("Submit Button clicked.");
             } else {
-                statusLabel.setText("Cancel Button clicked.");
+                statusLabel.setText("Reset Button clicked.");
             }
         }
     }
